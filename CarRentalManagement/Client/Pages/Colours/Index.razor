@@ -1,0 +1,70 @@
+﻿@page "/colours/"
+@inject HttpClient _httpClient
+@inject IJSRuntime js
+@attribute [Authorize]
+
+<HeadingComponent Text="Colours" />
+
+<br />
+
+<a href="/colours/create" class="btn btn-secondary">
+    <span class="oi oi-plus"></span>
+    Create New Colours
+</a>
+
+<br />
+@if (Colour == null)
+{
+    <div class="alert alert-info">Loading Colours..</div>
+}
+else
+{
+    <table class="table table-responsive">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var color in Colour)
+            {
+                <tr>
+                    <td>@color.Name</td>
+                    <td>
+                        <a href="/colours/view/@color.Id" class="btn btn-primary">
+                            <span class="oi oi-book"></span>
+                        </a>
+                        <a href="/colours/edit/@color.Id" class="btn btn-warning">
+                            <span class="oi oi-pencil"></span>
+                        </a>
+                        <button class="btn btn-danger" @onclick="@(()=>Delete(color.Id))">
+                            <span class="oi oi-delete"></span>
+                        </button>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Colour> Colour;
+
+    protected async override Task OnInitializedAsync()
+    {
+        Colour = await _httpClient.GetFromJsonAsync<List<Colour>>("/api/colours");
+    }
+
+    async Task Delete(int colorId)
+    {
+        var color = Colour.First(q => q.Id == colorId);
+        var confirm = await js.InvokeAsync<bool>("confirm", $"Do you want to delete {color.Name}?");
+        if (confirm)
+        {
+            await _httpClient.DeleteAsync($"{Endpoints.ColoursEndpoint}/{colorId}");
+            await OnInitializedAsync();
+        } 
+    }
+}

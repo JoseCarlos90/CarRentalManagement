@@ -6,7 +6,7 @@ using CarRentalManagement.Server.IRepository;
 namespace CarRentalManagement.Server.Controllers
 {
     //[Authorize]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ModelsController : ControllerBase
     {
@@ -104,7 +104,7 @@ namespace CarRentalManagement.Server.Controllers
             {
                 return NotFound();
             }
-            await _unitOfWork.Models.Insert(model);
+            await _unitOfWork.Models.Delete(model.Id);
             await _unitOfWork.Save(HttpContext);
             return NoContent();
         }

@@ -1,0 +1,77 @@
+﻿@page "/bookings/"
+@inject HttpClient _httpClient
+@inject IJSRuntime js
+@attribute [Authorize]
+
+    <HeadingComponent Text="Bookings" />
+    <br />
+    <a href="/bookings/create" class="btn btn-secondary">
+        <span class="oi oi-plus"></span>
+        Create New Booking
+    </a>
+    <br />
+    <br />
+@if (Bookings == null)
+{
+    <div class="alert alert-info">Loading bookings..</div>
+}
+else
+{
+    <table class="table table-responsive">
+        <thead>
+            <tr>
+                <th>Customer Tax Id</th>
+                <th>Date</th>
+                <th>Duration</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var booking in Bookings)
+            {
+                <tr>
+                    <td>@booking.Customer.TaxId</td>
+                    <td>@booking.DateCreated.Date.ToShortDateString()</td>
+                    <td>
+                        @if (booking.DateIn.HasValue){
+                            @((booking.DateIn.Value - booking.DateOut).TotalDays.ToString());
+                        }else{
+                        <span>To be determined</span>
+                        }
+                    </td>
+                    <td>
+                        <a href="/bookings/view/@booking.Id" class="btn btn-primary">
+                            <span class="oi oi-book"></span>
+                        </a>
+                        <a href="/bookings/edit/@booking.Id" class="btn btn-warning">
+                            <span class="oi oi-pencil"></span>
+                        </a>
+                        <button class="btn btn-danger" @onclick="@(()=>Delete(booking.Id))">
+                            <span class="oi oi-delete"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Booking> Bookings;
+
+    protected async override Task OnInitializedAsync()
+    {
+        Bookings = await _httpClient.GetFromJsonAsync<List<Booking>>("/api/bookings");
+    }
+
+    async Task Delete(int bookingId)
+    {
+        var booking = Bookings.First(q => q.Id == bookingId);
+        var confirm = await js.InvokeAsync<bool>("confirm", $"Do you want to delete {booking.Customer.TaxId}?");
+        if (confirm)
+        {
+            await _httpClient.DeleteAsync($"{Endpoints.BookingsEndpoint}/{booking}");
+            await OnInitializedAsync();
+        }
+    }
+}
