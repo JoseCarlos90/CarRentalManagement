@@ -1,70 +1,52 @@
 ﻿@page "/colours/"
-@inject HttpClient _httpClient
-@inject IJSRuntime js
 @attribute [Authorize]
-
-<HeadingComponent Text="Colours" />
-
-<br />
-
-<a href="/colours/create" class="btn btn-secondary">
-    <span class="oi oi-plus"></span>
-    Create New Colours
-</a>
-
-<br />
-@if (Colour == null)
-{
-    <div class="alert alert-info">Loading Colours..</div>
-}
-else
-{
-    <table class="table table-responsive">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var color in Colour)
-            {
+    <HeadingComponent Text="Colours" />
+    <br />
+    <a href="/colours/create" class="btn btn-secondary">
+        <span class="oi oi-plus"></span>
+        Create New Colour
+    </a>
+    <br />
+    <br />
+    @if (Colours == null)
+    {
+        <div class="alert alert-info">Loading Colours...</div>
+    }
+    else
+    {
+        <table class="table ">
+            <thead>
                 <tr>
-                    <td>@color.Name</td>
-                    <td>
-                        <a href="/colours/view/@color.Id" class="btn btn-primary">
-                            <span class="oi oi-book"></span>
-                        </a>
-                        <a href="/colours/edit/@color.Id" class="btn btn-warning">
-                            <span class="oi oi-pencil"></span>
-                        </a>
-                        <button class="btn btn-danger" @onclick="@(()=>Delete(color.Id))">
-                            <span class="oi oi-delete"></span>
-                        </button>
-
-                    </td>
+                    <th>Name</th>
+                    <th>Actions</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var colour in Colours)
+                {
+                    <tr>
+                        <td>@colour.Name</td>
 
-@code {
-    private List<Colour> Colour;
+                        <td>
+                            <a href="/colours/view/@colour.Id" class="btn btn-primary">
+                                <span class="oi oi-book"></span>
+                            </a>
+                            <a href="/colours/edit/@colour.Id" class="btn btn-warning">
+                                <span class="oi oi-pencil"></span>
+                            </a>
+                            <button class="btn btn-danger" @onclick="@(()=>Delete(colour.Id))">
+                                <span class="oi oi-delete"></span>
+                            </button>
 
-    protected async override Task OnInitializedAsync()
-    {
-        Colour = await _httpClient.GetFromJsonAsync<List<Colour>>("/api/colours");
+                        </td>
+                    </tr>
+
+                }
+            </tbody>
+        </table>
     }
 
-    async Task Delete(int colorId)
-    {
-        var color = Colour.First(q => q.Id == colorId);
-        var confirm = await js.InvokeAsync<bool>("confirm", $"Do you want to delete {color.Name}?");
-        if (confirm)
-        {
-            await _httpClient.DeleteAsync($"{Endpoints.ColoursEndpoint}/{colorId}");
-            await OnInitializedAsync();
-        } 
+
+    @code {
+        
     }
-}

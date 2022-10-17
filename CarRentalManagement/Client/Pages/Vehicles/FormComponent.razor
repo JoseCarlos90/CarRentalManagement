@@ -2,14 +2,31 @@
 <EditForm Model="@vehicle" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
-
-    @* <InputSelect Label="Title" Required="true" @bind-Value="vehicle.MakeId"/>*@
-    <fieldset disabled=@Disabled>
+    <fieldset disabled="@Disabled">
+        @if (Disabled)
+        {
+@*            <div class="form-group">
+                <label>Image (Optional):</label>
+                <div>
+                   <img src="@vehicle.ImageName" class="img-thumbnail" style="width:150px; height:150px" />
+                </div>
+            </div>*@
+        }
+        else
+        {
+            <div class="form-group">
+                <label>Image (Optional):</label>
+                <div>
+                    <InputFile OnChange="HandleFileSelection" />
+                    <p class="text-danger">@UploadFileWarning</p>
+                </div>
+            </div>
+        }
 
         <div class="form-group">
             <label>Make: </label>
             <div>
-                <InputSelect Required="true" @bind-Value="vehicle.MakeId" class="form-control">
+                <select @bind="vehicle.MakeId" class="form-control">
                     <option value="">-- Select Make --</option>
                     @if (Makes != null)
                     {
@@ -18,14 +35,14 @@
                             <option value="@make.Id">@make.Name</option>
                         }
                     }
-                </InputSelect>
+                </select>
                 <ValidationMessage For="@(() => vehicle.MakeId)" />
             </div>
         </div>
         <div class="form-group">
             <label>Model: </label>
             <div>
-                <InputSelect Required="true" @bind-Value="vehicle.ModelId" class="form-control">
+                <InputSelect @bind-Value="vehicle.ModelId" class="form-control">
                     <option value="">-- Select Model --</option>
                     @if (Models != null)
                     {
@@ -41,7 +58,7 @@
         <div class="form-group">
             <label>Colour: </label>
             <div>
-                <InputSelect Required="true" @bind-Value="vehicle.ColourId" class="form-control">
+                <select @bind="vehicle.ColourId" class="form-control">
                     <option value="">-- Select Colour --</option>
                     @if (Colours != null)
                     {
@@ -50,7 +67,7 @@
                             <option value="@colour.Id">@colour.Name</option>
                         }
                     }
-                </InputSelect>
+                </select>
                 <ValidationMessage For="@(() => vehicle.ColourId)" />
             </div>
         </div>
@@ -82,35 +99,17 @@
                 <ValidationMessage For="@(() => vehicle.RentalRate)" />
             </div>
         </div>
-
     </fieldset>
-
     @if (!Disabled)
     {
-        <div class="form-group">
-            <button type="submit" class="btn btn-success btn-block">
-                @ButtonText
-            </button>
-        </div>
+        <button type="submit" class="btn btn-success btn-block">
+            @ButtonText
+        </button>
     }
-
     <BackToList Target="vehicles" />
 </EditForm>
 
 
 @code {
-    private IList<Make> Makes;
-    private IList<Model> Models;
-    private IList<Colour> Colours;
-
-    protected async override Task OnInitializedAsync()
-    {
-        Models = await _client.GetFromJsonAsync<List<Model>>(Endpoints.ModelsEndpoint);
-        Colours = await _client.GetFromJsonAsync<List<Colour>>(Endpoints.ColoursEndpoint);
-        Makes = await _client.GetFromJsonAsync<List<Make>>(Endpoints.MakesEndpoint);
-    }
-    [Parameter] public bool Disabled { get; set; } = false;
-    [Parameter] public Vehicle? vehicle { get; set; }
-    [Parameter] public string ButtonText { get; set; } = "Save";
-    [Parameter] public EventCallback OnValidSubmit { get; set; }
+    
 }

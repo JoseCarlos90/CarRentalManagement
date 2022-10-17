@@ -1,8 +1,6 @@
-﻿@inject HttpClient _client
-<EditForm Model="@colour" OnValidSubmit="OnValidSubmit">
+﻿<EditForm Model="@colour" OnValidSubmit="@OnValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
-
     <fieldset disabled="@Disabled">
         <div class="form-group">
             <label>Name:</label>
@@ -11,29 +9,17 @@
                 <ValidationMessage For="@(() => colour.Name)" />
             </div>
         </div>
-
-        <hr />
-        <br />
-
+    </fieldset>
         @if (!Disabled)
         {
             <button type="submit" class="btn btn-success btn-block">
                 @ButtonText
             </button>
         }
-
-    </fieldset>
-
-
-    <BackToList Target="colours" />
-
+        <BackToList Target="colours" />
 </EditForm>
 
 
 @code {
-
-    [Parameter] public bool Disabled { get; set; } = false;
-    [Parameter] public Colour colour { get; set; }
-    [Parameter] public string ButtonText { get; set; } = "Save";
-    [Parameter] public EventCallback OnValidSubmit { get; set; }
+    
 }

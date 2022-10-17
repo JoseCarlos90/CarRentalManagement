@@ -1,13 +1,12 @@
-﻿@inject HttpClient _client
-
+﻿
 <EditForm Model="@booking" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
-    <fieldset disabled=@Disabled>
+    <fieldset disabled="@Disabled">
         <div class="form-group">
             <label>Vehicle: </label>
             <div>
-                <select @bind="booking.VehicleId" Required="true" class="form-control">
+                <select @bind="booking.VehicleId" class="form-control">
                     <option value="">-- Select Vehicle --</option>
                     @if (Vehicles != null)
                     {
@@ -23,7 +22,7 @@
         <div class="form-group">
             <label>Customer: </label>
             <div>
-                <InputSelect @bind-Value="booking.CustomerId" Required="true" class="form-control">
+                <InputSelect @bind-Value="booking.CustomerId" class="form-control">
                     <option value="">-- Select Customer --</option>
                     @if (Customers != null)
                     {
@@ -36,6 +35,7 @@
                 <ValidationMessage For="@(() => booking.CustomerId)" />
             </div>
         </div>
+
         <div class="form-group">
             <label>Date Out:</label>
             <div>
@@ -54,32 +54,17 @@
                 </div>
             </div>
         }
-
     </fieldset>
-    
-    @if(!Disabled){
+    @if (!Disabled)
+    {
         <button type="submit" class="btn btn-success btn-block">
-        @ButtonText
+            @ButtonText
         </button>
     }
-
-    
     <BackToList Target="bookings" />
 </EditForm>
 
 
 @code {
-    [Parameter] public bool Disabled { get; set; } = false;
-    [Parameter] public Booking booking { get; set; }
-    [Parameter] public string ButtonText { get; set; } = "Save";
-    [Parameter] public EventCallback OnValidSubmit { get; set; }
-
-    private IList<Vehicle> Vehicles;
-    private IList<Customer> Customers;
-
-    protected async override Task OnInitializedAsync()
-    {
-        Customers = await _client.GetFromJsonAsync<List<Customer>>(Endpoints.CustomersEndpoint);
-        Vehicles = await _client.GetFromJsonAsync<List<Vehicle>>($"{Endpoints.VehiclesEndpoint}");
-    }
+    
 }
